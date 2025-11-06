@@ -2,8 +2,8 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import HttpError from '../models/http.error.js';
 
-// JWT Secret - in production, use environment variables
-const JWT_SECRET = 'your_jwt_secret_key';
+// JWT Secret from environment variables
+const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key';
 
 export const checkAuth = (req: Request, res: Response, next: NextFunction) => {
   try {

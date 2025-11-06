@@ -1,9 +1,31 @@
 import mongoose, { Document, Schema } from 'mongoose';
 import bcrypt from 'bcryptjs';
+
 export interface IUser extends Document {
   email: string;
   password: string;
   name: string;
+  phone?: string;
+  isExperienceGuide: boolean;
+  guideProfile?: {
+    firstName: string;
+    lastName: string;
+    bio: string;
+    expertise: string;
+    activityField: string;
+    city: string;
+    activityArea: string;
+    email: string;
+    phone: string;
+    socialMedia?: {
+      instagram?: string;
+      telegram?: string;
+      linkedin?: string;
+    };
+    skillDocuments?: string[];
+    profileImage?: string;
+    isApproved: boolean;
+  };
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
 
@@ -23,6 +45,36 @@ const userSchema = new Schema({
   name: {
     type: String,
     required: true
+  },
+  phone: {
+    type: String,
+    trim: true
+  },
+  isExperienceGuide: {
+    type: Boolean,
+    default: false
+  },
+  guideProfile: {
+    firstName: String,
+    lastName: String,
+    bio: String,
+    expertise: String,
+    activityField: String,
+    city: String,
+    activityArea: String,
+    email: String,
+    phone: String,
+    socialMedia: {
+      instagram: String,
+      telegram: String,
+      linkedin: String
+    },
+    skillDocuments: [String],
+    profileImage: String,
+    isApproved: {
+      type: Boolean,
+      default: false
+    }
   }
 }, {
   timestamps: true
