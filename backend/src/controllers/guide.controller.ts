@@ -3,7 +3,6 @@ import User from '../models/user.js';
 import HttpError from '../models/http.error.js';
 import { isEmpty } from '../utils/utils.js';
 
-// Apply to become an experience guide
 export const applyAsExperienceGuide = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userId = (req as any).userData.userId;
@@ -22,7 +21,6 @@ export const applyAsExperienceGuide = async (req: Request, res: Response, next: 
       profileImage
     } = req.body;
 
-    // Validate required fields
     if (isEmpty(firstName) || isEmpty(lastName) || isEmpty(bio) || 
         isEmpty(expertise) || isEmpty(activityField) || isEmpty(city) || 
         isEmpty(activityArea) || isEmpty(email) || isEmpty(phone)) {
@@ -34,12 +32,10 @@ export const applyAsExperienceGuide = async (req: Request, res: Response, next: 
       return next(new HttpError('User not found', 404));
     }
 
-    // Check if user is already an experience guide
     if (user.isExperienceGuide && user.guideProfile?.isApproved) {
       return next(new HttpError('You are already an approved experience guide', 400));
     }
 
-    // Update user with guide profile
     user.isExperienceGuide = true;
     user.guideProfile = {
       firstName,
@@ -54,7 +50,7 @@ export const applyAsExperienceGuide = async (req: Request, res: Response, next: 
       socialMedia: socialMedia || {},
       skillDocuments: skillDocuments || [],
       profileImage: profileImage || '',
-      isApproved: false // Admin needs to approve
+      isApproved: false
     };
 
     await user.save();
@@ -70,7 +66,6 @@ export const applyAsExperienceGuide = async (req: Request, res: Response, next: 
   }
 };
 
-// Get experience guide profile
 export const getGuideProfile = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userId = (req as any).userData.userId;
@@ -95,7 +90,6 @@ export const getGuideProfile = async (req: Request, res: Response, next: NextFun
   }
 };
 
-// Update experience guide profile
 export const updateGuideProfile = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userId = (req as any).userData.userId;
@@ -110,7 +104,6 @@ export const updateGuideProfile = async (req: Request, res: Response, next: Next
       return next(new HttpError('You are not registered as an experience guide', 403));
     }
 
-    // Update guide profile fields
     if (user.guideProfile) {
       Object.keys(updates).forEach(key => {
         if (user.guideProfile && key in user.guideProfile) {
@@ -132,7 +125,6 @@ export const updateGuideProfile = async (req: Request, res: Response, next: Next
   }
 };
 
-// Get public guide profile (for users to view)
 export const getPublicGuideProfile = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { guideId } = req.params;
