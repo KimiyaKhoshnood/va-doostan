@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Link from "next/link";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -23,11 +24,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
+    <html lang="fa" dir="rtl">
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <header className="border-b border-zinc-200 dark:border-zinc-800">
+          <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+            <Link href="/" className="text-lg font-semibold">va-doostan</Link>
+            <div className="flex items-center gap-4 text-sm">
+              <Link href="/profile" className="hover:underline">پروفایل</Link>
+              <Link href="/guide/dashboard" className="hover:underline">داشبورد تجربه‌گردان</Link>
+            </div>
+          </nav>
+        </header>
+        <main className="mx-auto max-w-6xl px-6 py-8">
+          {children}
+        </main>
       </body>
     </html>
   );
