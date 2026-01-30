@@ -1,0 +1,323 @@
+## Experience Marketplace Platform
+
+> This document is optimized for AI pair-programmers (Cursor, Copilot, etc.)
+
+---
+
+## 1. Roles
+
+```ts
+enum Role {
+  USER
+  HOST
+}
+```
+
+### Rules
+
+* Every account starts as USER
+* USER can upgrade to HOST
+* HOST keeps all USER permissions
+
+---
+
+## 2. First Visit Flow (City Selection)
+
+### Trigger
+
+* `localStorage.city === null`
+
+### Flow
+
+1. Show welcome screen
+2. User selects a city
+3. Save city to `localStorage`
+4. Redirect to home page
+
+### Rules
+
+* City selection happens only once by default
+* City can be changed manually later
+
+---
+
+## 3. Home Page (Experience List)
+
+### Input
+
+```ts
+city: string (from localStorage)
+```
+
+### Logic
+
+```ts
+experiences = getExperiencesByCity(city)
+```
+
+### UI States
+
+#### Case 1: Experiences exist
+
+* Render experience cards
+
+#### Case 2: No experiences
+
+Show message:
+
+```
+No active experiences in your selected city.
+You can upgrade to host and create the first experience.
+```
+
+CTA:
+
+* Upgrade to Host
+
+---
+
+## 4. Experience Card
+
+### Fields
+
+* title
+* category
+* price
+* date
+* duration
+* hostName
+
+### Action
+
+* Click → Experience Detail Page
+
+---
+
+## 5. Experience Detail Page
+
+### Public Data
+
+* description
+* steps
+* date & time options
+* capacity
+* address
+* host profile preview
+
+### CTA
+
+* Reserve Experience
+
+---
+
+## 6. Auth Guard Logic
+
+### Rule
+
+```ts
+if (!isAuthenticated && action === "RESERVE") {
+  redirectToLogin()
+  afterLoginRedirectBack()
+}
+```
+
+### Protected Areas
+
+* Reserve
+* Profile
+* My Experiences
+* Host Panel
+
+---
+
+## 7. Reservation Flow
+
+### Steps
+
+1. User selects:
+
+   * date/time
+   * quantity
+2. System checks:
+
+```ts
+quantity <= remainingCapacity
+```
+
+3. Create Reservation (PENDING)
+4. Redirect to payment
+5. On success:
+
+   * Reservation → PAID
+   * Redirect to My Experiences
+
+---
+
+## 8. My Experiences Page
+
+### Data
+
+```ts
+getUserReservations(userId)
+```
+
+### Sections
+
+* Upcoming Experiences
+* Past Experiences
+
+### Each Item Shows
+
+* experience info
+* host contact info
+* reservation details
+
+---
+
+## 9. User Profile Page
+
+### Visible Fields
+
+* full name
+* phone
+* email
+* city
+
+### Conditional UI
+
+```ts
+if (role === USER) {
+  showUpgradeToHostButton()
+}
+```
+
+---
+
+## 10. Upgrade to Host Flow
+
+### Trigger
+
+* User clicks "Upgrade to Host"
+
+### Form Fields
+
+```ts
+HostProfileForm {
+  fullName: string
+  avatarUrl: string
+  bio: string
+  expertise: string
+  activityField: string
+  city: string
+  activityRange: string
+  contactInfo: string
+  socials?: SocialLinks
+  certificates?: string[]
+}
+```
+
+### Submit Logic
+
+```ts
+createHostProfile()
+updateUserRole(HOST)
+unlockHostPanel()
+```
+
+---
+
+## 11. Host Panel
+
+### Access Rule
+
+```ts
+role === HOST
+```
+
+---
+
+## 12. Host Panel Sections
+
+### 12.1 Create Experience
+
+```ts
+CreateExperienceForm {
+  title: string
+  category: string
+  description: string
+  steps: string[]
+  dateTime: Date
+  durationMinutes: number
+  capacity: number
+  price: number
+  address: string
+}
+```
+
+### Default State
+
+```ts
+status = DRAFT
+```
+
+---
+
+### 12.2 My Hosted Experiences
+
+For each experience:
+
+* status
+* capacity
+* reservations count
+
+---
+
+### 12.3 Edit Experience
+
+### Editable Fields
+
+* all except hostId
+
+### Status Transitions
+
+```ts
+DRAFT → ACTIVE
+ACTIVE → FULL (capacity = 0)
+ACTIVE → EXPIRED (date passed)
+```
+
+---
+
+## 13. Business Rules (Explicit)
+
+```ts
+- Host can also reserve experiences
+- Experience city must match host city
+- Experience must be ACTIVE to be reservable
+- Payment success is required to confirm reservation
+```
+
+---
+
+## 14. System States Summary
+
+### Experience Status
+
+```ts
+DRAFT | ACTIVE | FULL | EXPIRED
+```
+
+### Reservation Status
+
+```ts
+PENDING | PAID | CANCELLED | COMPLETED
+```
+
+---
+
+## 15. Non-Goals (Out of Scope for MVP)
+
+* Reviews & ratings
+* Refund logic
+* Multi-city experiences
+* Admin moderation panel
